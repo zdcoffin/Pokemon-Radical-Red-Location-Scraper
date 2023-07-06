@@ -85,7 +85,277 @@ def get_fishing_and_surfing_data(pokemon):
 
 
 
-print(get_fishing_and_surfing_data("Sealeo"))
+
+def get_safari_zone_info(pokemon):
+
+    safari_zone_worksheet = RR_sheet.get_worksheet(2)
+
+    pokemon_location_cells = safari_zone_worksheet.findall(pokemon)
+
+    area_dict = {}
+
+    for cell in pokemon_location_cells:
+        
+        row = cell.row
+        column = cell.col
+        name = cell.value
+
+        location = ""
+
+        if row < 18:
+            location = "Center"
+        elif row < 35:
+            location = "East"
+        elif row < 52:
+            location = "North"
+        else:
+            location = "West"
+        
+        how_where = ""
+
+        if column == 5:
+            how_where = "Grass, Day"
+        elif column == 10:
+            how_where = "Grass, Night"
+        elif column == 15:
+            how_where = "Old Rod"
+        elif column == 20:
+            how_where = "Good Rod"
+        elif column == 25:
+            how_where = "Super Rod"
+        elif column == 30:
+            how_where = "Surfing"
+        
+        percent = int((safari_zone_worksheet.cell(row, (column - 2)).value)[:-1])
+
+        if location not in area_dict:
+            area_dict[location] = [how_where, percent]
+        elif location in area_dict and how_where in area_dict[location]:
+            area_dict[location][(area_dict[location].index(how_where)) + 1] += percent
+        elif location in area_dict and how_where not in area_dict[location]:
+            area_dict[location].append(how_where)
+            area_dict[location].append(percent)
+        
+    return area_dict
+
+
+
+def get_fossil_info(pokemon):
+
+    fossil_worksheet = RR_sheet.get_worksheet(3)
+
+    pokemon_location_cells = fossil_worksheet.findall(pokemon)
+
+    area_list = []
+
+    for cell in pokemon_location_cells:
+
+        row = cell.row
+        column = cell.col
+        name = cell.value
+
+        shard_or_location = ""
+
+        if row < 10:
+            shard_or_location = (fossil_worksheet.cell(3, (column - 1)).value).title()
+            shard_or_location += " - Trade with a hiker on 1F of Celadon City Mansion"
+        else:
+            shard_or_location = (fossil_worksheet.cell(10, (column - 1)).value).title()
+        
+        area_list.append(shard_or_location)
+    
+    return area_list
+
+
+
+def get_legendary_and_static_info(pokemon):
+
+    legendary_and_static_worksheet = RR_sheet.get_worksheet(4)
+
+    pokemon_location_cell = legendary_and_static_worksheet.find(pokemon)
+
+    area_list = []
+
+    row = pokemon_location_cell.row
+    column = pokemon_location_cell.col
+    name = pokemon_location_cell.value
+
+    location = legendary_and_static_worksheet.cell(row, (column + 2)).value
+
+    area_list.append(location)
+
+    return area_list
+
+
+
+def get_raid_den_info(pokemon):
+
+    raid_den_worksheet = RR_sheet.get_worksheet(5)
+
+    pokemon_location_cells = raid_den_worksheet.findall(pokemon)
+
+    area_list = []
+
+    for cell in pokemon_location_cells:
+
+        row = cell.row
+        column = cell.col
+        name = cell.value
+
+        location_and_star = "Raid Den, " + raid_den_worksheet.cell((row - 2), 2).value
+
+        area_list.append(location_and_star)
+    
+    return(area_list)
+
+
+
+def get_egg_vendor_and_game_corner_info(pokemon):
+
+    egg_and_gc_worksheet = RR_sheet.get_worksheet(6)
+
+    pokemon_location_cells = egg_and_gc_worksheet.findall(pokemon)
+
+    area_list = []
+
+    for cell in pokemon_location_cells:
+
+        row = cell.row
+        column = cell.col
+        name = cell.value
+
+        shard_or_gc = ""
+
+        if row < 13:
+            shard_or_gc = (egg_and_gc_worksheet.cell(3, (column - 1)).value).title()
+            shard_or_gc += " - Trade shard in at Celadon City Mansion for an egg that MAY contain this Pokemon."
+        else:
+            shard_or_gc = "Buy at Celadon City Game Corner for 100,000"
+        
+        area_list.append(shard_or_gc)
+
+        return area_list
+    
+
+
+def get_trade_info(pokemon):
+
+    trade_worksheet = RR_sheet.get_worksheet(7)
+
+    pokemon_location_cell = trade_worksheet.find(pokemon)
+
+    row = pokemon_location_cell.row
+    column = pokemon_location_cell.col
+    name = pokemon_location_cell.value
+
+    area_dict = {}
+
+    location = (trade_worksheet.cell((row - 2), (column - 1)).value).title()
+    
+    if column == 4:
+        wanted_pokemon = (trade_worksheet.cell(row, (column + 2)).value)
+    else:
+        wanted_pokemon = (trade_worksheet.cell(row, (column + 3)).value)
+
+    area_dict[location] = [f"Trade for a {wanted_pokemon}"]
+
+    return area_dict
+
+
+
+def get_gift_info(pokemon):
+
+    gift_worksheet = RR_sheet.get_worksheet(8)
+
+    pokemon_location_cells = gift_worksheet.findall(pokemon)
+
+    area_dict = {}
+
+    for cell in pokemon_location_cells:
+
+        row = cell.row
+        column = cell.col
+        name = cell.value
+
+        location = (gift_worksheet.cell((row - 2), (column - 1)).value).title()
+        requirement = gift_worksheet.cell(row, (column + 1)).value
+
+        area_dict[location] = [requirement]
+
+    return area_dict
+
+
+def get_mystery_gift_info(pokemon):
+     
+    mystery_gift_worksheet = RR_sheet.get_worksheet(9)
+
+    pokemon_location_cell = mystery_gift_worksheet.find(pokemon)
+
+    area_list = []
+
+    row = pokemon_location_cell.row
+    column = pokemon_location_cell.col
+
+    code = mystery_gift_worksheet.cell(row, (column + 2)).value
+
+    area_list.append(f"Can be obtained with mystery gift code [{code}] at any Pokemon Center by talking to the red nurse.")
+
+    return area_list
+
+
+def get_unobtainable_info(pokemon):
+
+    unobtainable_worksheet = RR_sheet.get_worksheet(10)
+
+    area_list = []
+
+    if unobtainable_worksheet.find(pokemon):
+        area_list.append("This Pokemon is Unobtainable.")
+
+    
+    return area_list
+
+print(get_unobtainable_info("Pikachu"))
+
+
+
+
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+        
+        
+
+
+        
+        
+
+        
+
+
+
+
 
 
 
