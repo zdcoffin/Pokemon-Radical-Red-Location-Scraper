@@ -307,7 +307,7 @@ def get_egg_vendor_and_game_corner_info(pokemon):
         
         area_list.append(shard_or_gc)
 
-        return area_list
+    return area_list
     
 #dictionary
 def get_trade_info(pokemon):
@@ -318,6 +318,9 @@ def get_trade_info(pokemon):
 
     if not pokemon_location_cell:
         return
+    elif pokemon_location_cell.col == 6 or pokemon_location_cell.col == 14:
+        return
+
 
     area_dict = {} 
 
@@ -434,16 +437,6 @@ def get_unobtainable_info(pokemon):
     return area_list
 
 
-    
-pokemon = "Shinx"
-pokemon1 = "Tentacool"
-
-
-#print(get_grass_and_caves_data(pokemon))
-#print("------------------------------")
-#print("------------------------------")
-#print(get_fishing_and_surfing_data(pokemon1))
-
 
 final_worksheet = updated_sheet.get_worksheet(0)
 
@@ -466,7 +459,11 @@ def write_all_info(pokemon, column):
     final_worksheet = updated_sheet.get_worksheet(0)
 
     final_worksheet.update_cell(1, column, pokemon)
-        
+
+    link = "https://dex.radicalred.net/pokemon/" + str(pokemon)
+
+    final_worksheet.update_cell(3, column, link)
+
     write_to_category(get_grass_and_caves_data(pokemon), 4, column)
 
     write_to_category(get_fishing_and_surfing_data(pokemon), 15, column)
@@ -479,6 +476,8 @@ def write_all_info(pokemon, column):
 
     write_to_category(get_raid_den_info(pokemon), 39, column)
 
+    write_to_category(get_egg_vendor_and_game_corner_info(pokemon), 43, column)
+
     write_to_category(get_trade_info(pokemon), 44, column)
 
     write_to_category(get_gift_info(pokemon), 45, column)
@@ -490,11 +489,30 @@ def write_all_info(pokemon, column):
 
 
 
+# start column is name list number +1
+# name list[:] is name list number -1
+
+start_column = 234
+
+with open("RR_names_list_edited.txt", "r") as rr_names:
+
+    name_list = rr_names.readlines()
+
+    for name in name_list[232:]:
+
+        name_stripped = name.rstrip()
+
+        write_all_info(name_stripped, start_column)
+
+        start_column += 1
+
+        sleep(60)
 
 
-    
 
-write_all_info("Zapdos", 2)
+
+
+        
 
 
 
